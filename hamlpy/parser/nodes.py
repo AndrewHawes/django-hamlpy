@@ -47,7 +47,17 @@ def read_node(stream, prev, compiler):
         # convert indent to be all of the first character
         if indent:
             indent = indent[0] * len(indent)
-
+        
+        # return carriages are recorded as newlines on previous node
+        # if followed by a newline, it is skipped
+        if stream.text[stream.ptr] == '\r':
+            if prev:
+                prev.newlines += 1
+            stream.ptr += 1
+            if stream.text[stream.ptr] == '\n':
+                stream.ptr += 1
+            continue
+            
         # empty lines are recorded as newlines on previous node
         if stream.text[stream.ptr] == '\n':
             if prev:
